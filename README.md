@@ -1,7 +1,7 @@
 # compilierFront
 This is the source code for a compiler front end for a simple C-like language. It consists of two main components:
-- A Lexical Analyzer (Lexer) — defined in the file shown in  (simple.l or similar).
-- A Parser/Code Generator — defined in the file shown in the long pasted content (simple.y), using Bison/Yacc.
+- A Lexical Analyzer (Lexer) — simple.l
+- A Parser/Code Generator — simple.y
 Together, these tools translate a subset of C-like source code into x86-64 assembly language.
 
 - simple.l: Reads the input source code and breaks it into tokens (keywords, identifiers, operators, constants, etc.) for the parser.
