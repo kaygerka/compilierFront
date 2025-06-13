@@ -1,7 +1,5 @@
 %token	<string_val> WORD
-
 %token 	NOTOKEN LPARENT RPARENT LBRACE RBRACE LCURLY RCURLY COMA SEMICOLON EQUAL STRING_CONST LONG LONGSTAR VOID CHARSTAR CHARSTARSTAR INTEGER_CONST AMPERSAND OROR ANDAND EQUALEQUAL NOTEQUAL LESS GREAT LESSEQUAL GREATEQUAL PLUS MINUS TIMES DIVIDE PERCENT IF ELSE WHILE DO FOR CONTINUE BREAK RETURN
-
 %union	{
     char   *string_val;
     int nargs;
@@ -15,10 +13,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-
-
-
-
 int yylex();
 int yyerror(const char * s);
 
@@ -27,21 +21,20 @@ const char * input_file;
 char * asm_file;
 FILE * fasm;
 
+// MAX VARS ------
 #define MAX_ARGS 5
 int nargs;
 char * args_table[MAX_ARGS];
 
+// GLOBAL -----
 #define MAX_GLOBALS 100
 int nglobals = 0;
 char * global_vars_table[MAX_GLOBALS];
 
-/* GUSTAVO VIDEO */
+// LOCAL -----
 #define MAX_LOCALS 32
 int nlocals = 0;
 char * local_vars_table[MAX_LOCALS];
-/*===============*/
-
-
 
 /* === testing array types*/
 #define TYPE_LONG 0
@@ -54,16 +47,14 @@ int local_vars_type[MAX_LOCALS];
 int nstrings = 0;
 char * string_table[MAX_STRINGS];
 
+// ASSEMBLY 
 char *regStk[]={ "rbx", "r10", "r13", "r14", "r15"};
 char nregStk = sizeof(regStk)/sizeof(char*);
-
 char *regArgs[]={ "rdi", "rsi", "rdx", "rcx", "r8", "r9"};
 char nregArgs = sizeof(regArgs)/sizeof(char*);
 
 int top = 0;
-
 int nargs =0;
- 
 int nlabel = 0;
 
 #define MAX_LOOP_DEPTH 100
@@ -72,19 +63,19 @@ int loop_stack_top = 0;
 
 // push loop on stack
 void push_loop(int label) {
-    if (loop_stack_top < MAX_LOOP_DEPTH) {
-        loop_stack[loop_stack_top++] = label;
-    } else {
-        yyerror("Loop nesting too deep");
-    }
+  if (loop_stack_top < MAX_LOOP_DEPTH) {
+    loop_stack[loop_stack_top++] = label;
+  } else {
+    yyerror("Loop nesting too deep");
+  }
 }
 // pop loop from stack
 int pop_loop() {
-    if (loop_stack_top > 0) {
-        return loop_stack[--loop_stack_top];
-    }
-    yyerror("Break outside of loop");
-    return -1;
+  if (loop_stack_top > 0) {
+    return loop_stack[--loop_stack_top];
+   }
+  yyerror("Break outside of loop");
+  return -1;
 }
 
 %}
@@ -120,7 +111,7 @@ function: var_type WORD {
     fprintf(fasm, "\tpushq %%rbp\n");
     fprintf(fasm, "\tmovq %%rsp,%%rbp\n");
 
-    /* GUSTAVOS CODE!! THIS IS KEEP BC WE ARE MAKING SPACE FOR LOCAL VAR */
+    /* KEEP BC WE ARE MAKING SPACE FOR LOCAL VAR */
 
     // allocating space for local vars on the stack
     fprintf(fasm, "\tsubq $%d, %%rsp\n", MAX_LOCALS * 8);
@@ -146,7 +137,7 @@ LPARENT arguments RPARENT compound_statement {
     fprintf(fasm, "\tpopq %%rbx\n");
     fprintf(fasm, "\tpopq %%rbx\n");
 
-    /* GUSTAVOS CODE!! KEEP THIS TO RESTORE STACK TO HOW IT WAS BEFORE */
+    /* KEEP THIS TO RESTORE STACK TO HOW IT WAS BEFORE */
     // deallocate local var space on stack
     fprintf(fasm, "\taddq $%d, %%rsp\n", MAX_LOCALS * 8);
     //restore old frame ptr and stakc ptr
